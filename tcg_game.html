@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Monster TCG Pocket ⚡</title>
+    <style>
+        :root { --bg: #0b0e14; --card: #1c2331; --rare: #ffcc00; --ultra: #00f2ff; --mythic: #ff00ff; --legend: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); --accent: #ff0055; --gem: #a855f7; --gold: #ffd700; }
+        body { background: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; touch-action: none; }
+        
+        header { width: 100%; padding: 15px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; z-index: 100; border-bottom: 2px solid #333; box-sizing: border-box; align-items: center; }
+        .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 13px; }
+
+        #battle-arena { position: fixed; inset: 0; background: #0b0e14; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; overflow-y: auto; }
+        .arena-card { width: 130px; height: 180px; position: relative; transition: 0.2s; flex-shrink: 0; }
+        .hp-bg { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-bottom: 5px; border: 1px solid #444; }
+        .hp-bar { height: 100%; background: #22c55e; transition: 0.3s; width: 100%; }
+        
+        #arena-selection-zone { width: 100%; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; margin-top: 10px; display: flex; gap: 10px; overflow-x: auto; min-height: 160px; border-top: 1px solid #333; }
+        .mini-card-slot { width: 90px; height: 130px; flex-shrink: 0; transform: scale(0.9); transition: 0.2s; }
+
+        #pack-select { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
+        .pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .pack-choice { width: 85px; height: 120px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid white; position: relative; }
+
+        #pack-view { position: fixed; inset: 0; background: radial-gradient(circle, #2e3a59 0%, #0b0e14 100%); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        .pack-wrapper { width: 240px; height: 360px; position: relative; display: flex; justify-content: center; }
+        .pack-art { width: 100%; height: 100%; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 80px; border: 5px solid white; position: relative; overflow: hidden; background: #222; box-sizing: border-box; }
+        .pack-top-rip { position: absolute; top: 0; left: 0; width: 100%; height: 50px; background: #b91c1c; border-bottom: 4px dashed rgba(255,255,255,0.6); border-radius: 15px 15px 0 0; transition: transform 0.6s; z-index: 10; box-sizing: border-box; pointer-events: auto; }
+        
+        #reveal-view { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
+        .reveal-stage { width: 240px; height: 340px; position: relative; }
+        .reveal-card { position: absolute; inset: 0; transition: 0.6s; cursor: ns-resize; }
+        .swiped-up { transform: translateY(-150vh) rotate(-10deg) !important; opacity: 0; }
+
+        .card { width: 100%; height: 100%; background: #fff; border: 6px solid #d1d5db; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color: #111; box-sizing: border-box; position: relative; font-size: 8px; }
+        .card.rare { border-color: var(--rare); background: #fffdf5; }
+        .card.ultra { border-color: var(--ultra); box-shadow: 0 0 15px var(--ultra); }
+        .card.mythic { border-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
+        .card.legendary { border-image: var(--legend) 1; border-width: 6px; border-style: solid; animation: rainbow-glow 3s infinite linear; }
+        .card.energy { background: #cbd5e1; border-color: #475569; }
+        
+        @keyframes rainbow-glow { 0% { box-shadow: 0 0 10px red; } 50% { box-shadow: 0 0 30px blue; } 100% { box-shadow: 0 0 10px red; } }
+        
+        .c-header { padding: 4px; display: flex; justify-content: space-between; font-weight: bold; }
+        .c-name { padding: 1px 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .c-art { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 60px; background: #eee; margin: 3px; border-radius: 4px; border: 1px solid #ddd; }
+        .c-body { padding: 3px; flex-grow: 1; text-align: center; }
+        .c-footer { font-size: 6px; padding: 2px 5px; display: flex; justify-content: space-between; background: #f8fafc; border-top: 1px solid #eee; }
+
+        .lvl-btn { background: var(--gem); color: white; border: none; font-size: 8px; padding: 1px 4px; border-radius: 4px; cursor: pointer; margin-top: 2px; }
+
+        #binder-frame { background: #1e293b; border: 10px solid #0f172a; border-radius: 20px; padding: 15px; margin-top: 10px; width: 90%; max-width: 400px; min-height: 480px; box-sizing: border-box; }
+        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
+        .binder-slot { height: 230px; }
+        
+        #type-filter { margin: 10px 0; padding: 8px; border-radius: 8px; background: #333; color: white; border: 1px solid #555; width: 90%; max-width: 400px; }
+        
+        .bundle-row { display: flex; gap: 10px; margin-top: 10px; }
+        .bundle-btn { background: #475569; color: white; border: 2px solid #94a3b8; padding: 8px; border-radius: 10px; font-size: 11px; cursor: pointer; flex: 1; font-weight: bold; }
+        .bundle-btn span { color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="color:var(--gem); font-weight:bold;">💎 <span id="gem-count">100</span></div>
+    <button class="btn" onclick="showPackSelect()">🎁 GET PACKS</button>
+    <button class="btn" style="background:#22c55e" onclick="openArena()">⚔️ FIGHT</button>
+</header>
+
+<select id="type-filter" onchange="showBinder()">
+    <option value="all">Organize: All Cards</option>
+    <option value="Common">Common</option>
+    <option value="Rare">Rare</option>
+    <option value="Ultra">Ultra Rare</option>
+    <option value="Mythic">Mythic</option>
+    <option value="Legendary">Legendary</option>
+    <option value="Energy">Energy</option>
+</select>
+
+<div id="battle-arena">
+    <div id="cpu-side" style="width:150px">
+        <div class="hp-bg"><div id="cpu-hp" class="hp-bar"></div></div>
+        <div id="cpu-arena-card" class="arena-card"></div>
+    </div>
+    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:14px;">Select a fighter!</div>
+    <div id="player-side" style="width:150px">
+        <div id="player-arena-card" class="arena-card"></div>
+        <div class="hp-bg" style="margin-top:5px;"><div id="player-hp" class="hp-bar"></div></div>
+    </div>
+    <div style="display:flex; gap:10px; margin: 10px 0;">
+        <button id="atk-btn" class="btn" style="display:none; background:red;" onclick="attack()">ATTACK!</button>
+        <button class="btn" style="background:#444;" onclick="closeArena()">CLOSE</button>
+    </div>
+    <div id="arena-selection-zone"></div>
+</div>
+
+<div id="pack-select">
+    <h2 style="color:white; margin:5px;">Select Pack</h2>
+    <div class="pack-grid">
+        <div class="pack-choice" style="background:#ef4444;" onclick="setPackType('🔥')">🔥</div>
+        <div class="pack-choice" style="background:#3b82f6;" onclick="setPackType('💧')">💧</div>
+        <div class="pack-choice" style="background:#22c55e;" onclick="setPackType('🍃')">🍃</div>
+        <div class="pack-choice" style="background:#eab308;" onclick="setPackType('⚡')">⚡</div>
+        <div class="pack-choice" style="background:#a855f7;" onclick="setPackType('🔮')">🔮</div>
+        <div class="pack-choice" style="background:#64748b;" onclick="setPackType('🦾')">🦾</div>
+    </div>
+    
+    <div style="margin-top:15px; color:#94a3b8; font-size:12px; font-weight:bold;">MULTI-RIP BUNDLES</div>
+    <div class="bundle-row">
+        <button class="bundle-btn" onclick="startBundle(3)">RIP 3 PACKS</button>
+        <button class="bundle-btn" onclick="startBundle(5)">RIP 5 PACKS</button>
+    </div>
+
+    <button class="btn" style="margin-top:15px; background:var(--legend); border:1px solid gold; width:220px" onclick="buyGodPack()">🔱 GOD PACK (500💎)</button>
+    <button class="btn" style="margin-top:10px; background:#444;" onclick="document.getElementById('pack-select').style.display='none'">BACK</button>
+</div>
+
+<div id="pack-view">
+    <div class="pack-wrapper">
+        <div class="pack-art" id="current-pack-art"><div id="pack-emoji">🔥</div></div>
+        <div class="pack-top-rip" id="rip-line"></div>
+    </div>
+</div>
+
+<div id="reveal-view"><div class="reveal-stage" id="reveal-stage"></div></div>
+
+<div id="binder-frame"><div id="main-display"></div></div>
+
+<div style="margin:15px; display:flex; gap:20px; align-items:center;">
+    <button class="btn" onclick="prevPage()">⬅️</button>
+    <span id="page-indicator">Page 1</span>
+    <button class="btn" onclick="nextPage()">➡️</button>
+</div>
+
+<script>
+    const CARD_DB = {
+        Common: [
+            {n:"Leafur", e:"🍃", h:60, d:20, id:1}, {n:"Embear", e:"🔥", h:60, d:30, id:2}, {n:"Bubbles", e:"💧", h:50, d:20, id:3}, 
+            {n:"Cinder-Cat", e:"🐱", h:55, d:35, id:4}, {n:"Stone-Pup", e:"🐶", h:70, d:15, id:5}, {n:"Bugsy", e:"🐛", h:40, d:10, id:6}
+        ],
+        Rare: [
+            {n:"Vine-Serp", e:"🐍", h:120, d:50, id:20}, {n:"Blaze-Wolf", e:"🐺", h:120, d:60, id:21}, {n:"Giga-Golem", e:"🗿", h:150, d:40, id:22},
+            {n:"Snow-Owl", e:"🦉", h:110, d:45, id:23}, {n:"Iron-Boar", e:"🐗", h:140, d:35, id:24}, {n:"Neon-Bat", e:"🦇", h:100, d:55, id:25},
+            {n:"Crag-Crab", e:"🦀", h:130, d:40, id:26}, {n:"Volt-Fox", e:"🦊", h:105, d:65, id:27}
+        ],
+        Ultra: [
+            {n:"ZENITH", e:"🐉", h:220, d:130, id:50}, {n:"TITAN", e:"⚡", h:200, d:110, id:51}, {n:"Void-Witch", e:"🧙‍♀️", h:180, d:140, id:52},
+            {n:"Inferno-Lion", e:"🦁", h:210, d:125, id:53}, {n:"Frost-Giant", e:"❄️", h:240, d:100, id:54}, {n:"Cyber-Shark", e:"🦈", h:190, d:150, id:55}
+        ],
+        Mythic: [
+            {n:"UNIKNIGHT", e:"🦄", h:300, d:180, id:70}, {n:"PHOENIX", e:"🐦", h:280, d:200, id:71}, {n:"GRIFFIN", e:"🦅", h:320, d:170, id:72},
+            {n:"HYDRA", e:"🐲", h:350, d:160, id:73}, {n:"KRAKEN", e:"🦑", h:400, d:150, id:74}
+        ],
+        Legendary: [
+            {n:"GOD-EYE", e:"👁️", h:500, d:350, id:99}, {n:"SUN-KING", e:"☀️", h:600, d:300, id:100}, {n:"MOON-QUEEN", e:"🌙", h:550, d:320, id:101},
+            {n:"TIME-LORD", e:"⏳", h:450, d:400, id:102}
+        ],
+        Energy: [{n:"Fire En", e:"🔥", h:0, d:0, id:"E1"}, {n:"Water En", e:"💧", h:0, d:0, id:"E2"}, {n:"Leaf En", e:"🍃", h:0, d:0, id:"E3"}]
+    };
+
+    let collection = JSON.parse(localStorage.getItem('tcg_binder_array')) || [];
+    let gems = parseInt(localStorage.getItem('tcg_gems')) || 100;
+    let currentPage = 0;
+    let pHP, cHP, pMax, cMax, pDmg, forceGodPack = false;
+    let selectedPackEmoji = '🔥';
+    let packsRemainingInBundle = 0;
+
+    function showPackSelect() { document.getElementById('pack-select').style.display = 'flex'; }
+    function setPackType(emoji) { selectedPackEmoji = emoji; openPack(emoji); }
+    function startBundle(count) { packsRemainingInBundle = count; openPack(selectedPackEmoji); }
+
+    function buyGodPack() {
+        if(gems < 500) return alert("Need 500 Gems!");
+        gems -= 500; forceGodPack = true; openPack('🔱');
+    }
+
+    function openPack(emoji) {
+        document.getElementById('pack-select').style.display = 'none';
+        document.getElementById('pack-emoji').innerText = emoji;
+        document.getElementById('rip-line').style.transform = "none";
+        document.getElementById('rip-line').style.opacity = "1";
+        document.getElementById('pack-view').style.display = 'flex';
+        document.getElementById('rip-line').onpointerdown = () => {
+            document.getElementById('rip-line').style.transform = "translateX(350px) rotate(40deg)";
+            setTimeout(startReveal, 500);
+        };
+    }
+
+    function startReveal() {
+        document.getElementById('pack-view').style.display = 'none';
+        document.getElementById('reveal-view').style.display = 'flex';
+        const stage = document.getElementById('reveal-stage');
+        stage.innerHTML = "";
+        
+        let pack = [];
+        let isGod = forceGodPack || Math.random() < 0.01;
+        forceGodPack = false;
+
+        for(let i=0; i<7; i++) {
+            let type;
+            if(isGod) {
+                let r = Math.random();
+                type = r < 0.6 ? 'Ultra' : (r < 0.9 ? 'Mythic' : 'Legendary');
+            } else {
+                type = (i < 4 ? 'Common' : (i < 6 ? 'Energy' : 'Rare'));
+                if(i === 6 && Math.random() < 0.15) type = 'Ultra';
+            }
+            
+            // Basic Duplicate Protection: try to find a card not already in the pack
+            let pool = CARD_DB[type];
+            let card = pool[Math.floor(Math.random()*pool.length)];
+            let attempts = 0;
+            while(pack.some(p => p.id === card.id) && attempts < 10) {
+                card = pool[Math.floor(Math.random()*pool.length)];
+                attempts++;
+            }
+            pack.push({...card, r:type});
+        }
+
+        let idx = 0;
+        function next() {
+            if(idx >= 7) { 
+                document.getElementById('reveal-view').style.display = 'none'; 
+                if(packsRemainingInBundle > 1) { packsRemainingInBundle--; openPack(selectedPackEmoji); }
+                else { packsRemainingInBundle = 0; showBinder(); }
+                return; 
+            }
+            const div = document.createElement('div');
+            div.className = "reveal-card";
+            div.innerHTML = createCardHTML(pack[idx]);
+            div.onpointerdown = () => {
+                div.classList.add('swiped-up');
+                collection.push(pack[idx]);
+                idx++;
+                setTimeout(() => { div.remove(); next(); }, 400);
+            };
+            stage.appendChild(div);
+        }
+        next();
+    }
+
+    function createCardHTML(c, idx = null) {
+        let rClass = c.r ? c.r.toLowerCase() : 'common';
+        let levelBtn = (idx !== null && c.h > 0) ? `<button class="lvl-btn" onclick="event.stopPropagation(); levelUp(${idx})">Lvl Up (20💎)</button>` : '';
+        return `<div class="card ${rClass}" onclick="selectForBattle(${idx})">
+            <div class="c-header"><span>BASIC</span> <span>${c.h > 0 ? 'HP '+c.h : ''}</span></div>
+            <div class="c-name">${c.n}</div>
+            <div class="c-art">${c.e}</div>
+            <div class="c-body"><b>${c.d > 0 ? 'ATK: '+c.d : 'ENERGY'}</b><br>${levelBtn}</div>
+            <div class="c-footer"><span>${c.id}/120</span> <span>TCG-P</span></div>
+        </div>`;
+    }
+
+    function levelUp(idx) {
+        if(gems < 20) return alert("Need 20 Gems!");
+        gems -= 20; collection[idx].d += 10; updateStats(); showBinder(); updateArenaSelection();
+    }
+
+    function openArena() {
+        if(collection.length === 0) return alert("Get cards first!");
+        document.getElementById('battle-arena').style.display = 'flex';
+        let cpuPool = [...CARD_DB.Rare, ...CARD_DB.Ultra, ...CARD_DB.Mythic];
+        let cpu = cpuPool[Math.floor(Math.random()*cpuPool.length)];
+        cMax = cpu.h; cHP = cpu.h;
+        document.getElementById('cpu-arena-card').innerHTML = createCardHTML(cpu);
+        document.getElementById('cpu-hp').style.width = "100%";
+        updateArenaSelection();
+    }
+
+    function updateArenaSelection() {
+        const zone = document.getElementById('arena-selection-zone');
+        zone.innerHTML = "";
+        collection.filter(c => c.h > 0).forEach((c, i) => {
+            const actualIndex = collection.indexOf(c);
+            const slot = document.createElement('div');
+            slot.className = "mini-card-slot";
+            slot.innerHTML = createCardHTML(c, actualIndex);
+            zone.appendChild(slot);
+        });
+    }
+
+    function selectForBattle(idx) {
+        if(idx === null || document.getElementById('battle-arena').style.display !== 'flex' || collection[idx].h === 0) return;
+        let p = collection[idx];
+        pMax = p.h; pHP = p.h; pDmg = p.d;
+        document.getElementById('player-arena-card').innerHTML = createCardHTML(p);
+        document.getElementById('player-hp').style.width = "100%";
+        document.getElementById('atk-btn').style.display = "block";
+    }
+
+    function attack() {
+        cHP -= pDmg;
+        document.getElementById('cpu-hp').style.width = Math.max(0, (cHP/cMax*100)) + "%";
+        if(cHP <= 0) { alert("Victory! +50 Gems"); gems+=50; return closeArena(); }
+        setTimeout(() => {
+            pHP -= 30;
+            document.getElementById('player-hp').style.width = Math.max(0, (pHP/pMax*100)) + "%";
+            if(pHP <= 0) { alert("Defeat!"); return closeArena(); }
+        }, 500);
+    }
+
+    function closeArena() { document.getElementById('battle-arena').style.display = 'none'; updateStats(); }
+
+    function showBinder() {
+        const display = document.getElementById('main-display');
+        display.innerHTML = "";
+        const filter = document.getElementById('type-filter').value;
+        let filtered = filter === 'all' ? collection : collection.filter(c => c.r === filter);
+        filtered.slice(currentPage*6, (currentPage*6)+6).forEach((c, i) => {
+            const slot = document.createElement('div');
+            slot.className = "binder-slot";
+            slot.innerHTML = createCardHTML(c, collection.indexOf(c));
+            display.appendChild(slot);
+        });
+        document.getElementById('page-indicator').innerText = "Page " + (currentPage + 1);
+        updateStats();
+    }
+
+    function updateStats() {
+        document.getElementById('gem-count').innerText = gems;
+        localStorage.setItem('tcg_gems', gems);
+        localStorage.setItem('tcg_binder_array', JSON.stringify(collection));
+    }
+    function nextPage() { if((currentPage+1)*6 < collection.length) { currentPage++; showBinder(); } }
+    function prevPage() { if(currentPage > 0) { currentPage--; showBinder(); } }
+
+    showBinder();
+</script>
+</body>
+</html>
