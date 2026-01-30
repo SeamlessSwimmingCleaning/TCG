@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>TCG Pocket ⚡</title>
+    <title>JUST TCG pocket</title>
     <style>
         :root { --bg: #0b0e14; --card: #1c2331; --rare: #ffcc00; --ultra: #00f2ff; --mythic: #ff00ff; --legend: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); --accent: #ff0055; --gem: #a855f7; --gold: #ffd700; }
-        body { background: var(--bg); color: white; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; touch-action: none; }
+        
+        /* Fix for iOS 12 tap delay and scrolling */
+        * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+        body { background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; }
         
         header { width: 100%; padding: 15px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; z-index: 100; border-bottom: 2px solid #333; box-sizing: border-box; align-items: center; }
         .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 13px; }
@@ -23,7 +27,8 @@
 
         #pack-select { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
         .pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .pack-choice { width: 85px; height: 120px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid white; position: relative; }
+        .pack-choice { width: 85px; height: 120px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid white; position: relative; transition: 0.2s; }
+        .pack-choice.selected { border-color: var(--ultra); box-shadow: 0 0 15px var(--ultra); transform: scale(1.05); }
 
         #pack-view { position: fixed; inset: 0; background: radial-gradient(circle, #2e3a59 0%, #0b0e14 100%); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
         .pack-wrapper { width: 240px; height: 360px; position: relative; display: flex; justify-content: center; }
@@ -60,7 +65,6 @@
         
         .bundle-row { display: flex; gap: 10px; margin-top: 10px; }
         .bundle-btn { background: #475569; color: white; border: 2px solid #94a3b8; padding: 8px; border-radius: 10px; font-size: 11px; cursor: pointer; flex: 1; font-weight: bold; }
-        .bundle-btn span { color: var(--gold); }
     </style>
 </head>
 <body>
@@ -86,7 +90,7 @@
         <div class="hp-bg"><div id="cpu-hp" class="hp-bar"></div></div>
         <div id="cpu-arena-card" class="arena-card"></div>
     </div>
-    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:14px;">Select a fighter!</div>
+    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:14px;">Select fighter!</div>
     <div id="player-side" style="width:150px">
         <div id="player-arena-card" class="arena-card"></div>
         <div class="hp-bg" style="margin-top:5px;"><div id="player-hp" class="hp-bar"></div></div>
@@ -101,18 +105,19 @@
 <div id="pack-select">
     <h2 style="color:white; margin:5px;">Select Pack</h2>
     <div class="pack-grid">
-        <div class="pack-choice" style="background:#ef4444;" onclick="setPackType('🔥')">🔥</div>
-        <div class="pack-choice" style="background:#3b82f6;" onclick="setPackType('💧')">💧</div>
-        <div class="pack-choice" style="background:#22c55e;" onclick="setPackType('🍃')">🍃</div>
-        <div class="pack-choice" style="background:#eab308;" onclick="setPackType('⚡')">⚡</div>
-        <div class="pack-choice" style="background:#a855f7;" onclick="setPackType('🔮')">🔮</div>
-        <div class="pack-choice" style="background:#64748b;" onclick="setPackType('🦾')">🦾</div>
+        <div class="pack-choice" id="p-fire" style="background:#ef4444;" onclick="selectTheme('🔥', '#ef4444', 'p-fire')">🔥</div>
+        <div class="pack-choice" id="p-water" style="background:#3b82f6;" onclick="selectTheme('💧', '#3b82f6', 'p-water')">💧</div>
+        <div class="pack-choice" id="p-grass" style="background:#22c55e;" onclick="selectTheme('🍃', '#22c55e', 'p-grass')">🍃</div>
+        <div class="pack-choice" id="p-bolt" style="background:#eab308;" onclick="selectTheme('⚡', '#eab308', 'p-bolt')">⚡</div>
+        <div class="pack-choice" id="p-void" style="background:#a855f7;" onclick="selectTheme('🔮', '#a855f7', 'p-void')">🔮</div>
+        <div class="pack-choice" id="p-steel" style="background:#64748b;" onclick="selectTheme('⚙️', '#64748b', 'p-steel')">⚙️</div>
     </div>
     
-    <div style="margin-top:15px; color:#94a3b8; font-size:12px; font-weight:bold;">MULTI-RIP BUNDLES</div>
+    <div style="margin-top:15px; color:#94a3b8; font-size:12px; font-weight:bold;">CHOOSE QUANTITY</div>
     <div class="bundle-row">
-        <button class="bundle-btn" onclick="startBundle(3)">RIP 3 PACKS</button>
-        <button class="bundle-btn" onclick="startBundle(5)">RIP 5 PACKS</button>
+        <button class="bundle-btn" onclick="startRip(1)">1 PACK</button>
+        <button class="bundle-btn" onclick="startRip(3)">3 PACKS</button>
+        <button class="bundle-btn" onclick="startRip(5)">5 PACKS</button>
     </div>
 
     <button class="btn" style="margin-top:15px; background:var(--legend); border:1px solid gold; width:220px" onclick="buyGodPack()">🔱 GOD PACK (500💎)</button>
@@ -137,54 +142,55 @@
 </div>
 
 <script>
-    const CARD_DB = {
-        Common: [
-            {n:"Leafur", e:"🍃", h:60, d:20, id:1}, {n:"Embear", e:"🔥", h:60, d:30, id:2}, {n:"Bubbles", e:"💧", h:50, d:20, id:3}, 
-            {n:"Cinder-Cat", e:"🐱", h:55, d:35, id:4}, {n:"Stone-Pup", e:"🐶", h:70, d:15, id:5}, {n:"Bugsy", e:"🐛", h:40, d:10, id:6}
-        ],
-        Rare: [
-            {n:"Vine-Serp", e:"🐍", h:120, d:50, id:20}, {n:"Blaze-Wolf", e:"🐺", h:120, d:60, id:21}, {n:"Giga-Golem", e:"🗿", h:150, d:40, id:22},
-            {n:"Snow-Owl", e:"🦉", h:110, d:45, id:23}, {n:"Iron-Boar", e:"🐗", h:140, d:35, id:24}, {n:"Neon-Bat", e:"🦇", h:100, d:55, id:25},
-            {n:"Crag-Crab", e:"🦀", h:130, d:40, id:26}, {n:"Volt-Fox", e:"🦊", h:105, d:65, id:27}
-        ],
-        Ultra: [
-            {n:"ZENITH", e:"🐉", h:220, d:130, id:50}, {n:"TITAN", e:"⚡", h:200, d:110, id:51}, {n:"Void-Witch", e:"🧙‍♀️", h:180, d:140, id:52},
-            {n:"Inferno-Lion", e:"🦁", h:210, d:125, id:53}, {n:"Frost-Giant", e:"❄️", h:240, d:100, id:54}, {n:"Cyber-Shark", e:"🦈", h:190, d:150, id:55}
-        ],
-        Mythic: [
-            {n:"UNIKNIGHT", e:"🦄", h:300, d:180, id:70}, {n:"PHOENIX", e:"🐦", h:280, d:200, id:71}, {n:"GRIFFIN", e:"🦅", h:320, d:170, id:72},
-            {n:"HYDRA", e:"🐲", h:350, d:160, id:73}, {n:"KRAKEN", e:"🦑", h:400, d:150, id:74}
-        ],
-        Legendary: [
-            {n:"GOD-EYE", e:"👁️", h:500, d:350, id:99}, {n:"SUN-KING", e:"☀️", h:600, d:300, id:100}, {n:"MOON-QUEEN", e:"🌙", h:550, d:320, id:101},
-            {n:"TIME-LORD", e:"⏳", h:450, d:400, id:102}
-        ],
+    // iOS 12 Friendly Script
+    var CARD_DB = {
+        Common: [{n:"Leafur", e:"🍃", h:60, d:20, id:1}, {n:"Embear", e:"🔥", h:60, d:30, id:2}, {n:"Bubbles", e:"💧", h:50, d:20, id:3}, {n:"Cinder-Cat", e:"🐱", h:55, d:35, id:4}, {n:"Stone-Pup", e:"🐶", h:70, d:15, id:5}],
+        Rare: [{n:"Vine-Serp", e:"🐍", h:120, d:50, id:20}, {n:"Blaze-Wolf", e:"🐺", h:120, d:60, id:21}, {n:"Giga-Golem", e:"🗿", h:150, d:40, id:22}, {n:"Snow-Owl", e:"🦉", h:110, d:45, id:23}, {n:"Volt-Fox", e:"🦊", h:105, d:65, id:27}],
+        Ultra: [{n:"ZENITH", e:"🐉", h:220, d:130, id:50}, {n:"TITAN", e:"⚡", h:200, d:110, id:51}, {n:"Frost-Giant", e:"❄️", h:240, d:100, id:54}],
+        Mythic: [{n:"STAR-HORSE", e:"🐎", h:300, d:180, id:70}, {n:"PHOENIX", e:"🐦", h:280, d:200, id:71}, {n:"HYDRA", e:"🐉", h:350, d:160, id:73}],
+        Legendary: [{n:"GOD-EYE", e:"👁️", h:500, d:350, id:99}, {n:"SUN-KING", e:"☀️", h:600, d:300, id:100}],
         Energy: [{n:"Fire En", e:"🔥", h:0, d:0, id:"E1"}, {n:"Water En", e:"💧", h:0, d:0, id:"E2"}, {n:"Leaf En", e:"🍃", h:0, d:0, id:"E3"}]
     };
 
-    let collection = JSON.parse(localStorage.getItem('tcg_binder_array')) || [];
-    let gems = parseInt(localStorage.getItem('tcg_gems')) || 100;
-    let currentPage = 0;
-    let pHP, cHP, pMax, cMax, pDmg, forceGodPack = false;
-    let selectedPackEmoji = '🔥';
-    let packsRemainingInBundle = 0;
+    var collection = JSON.parse(localStorage.getItem('tcg_binder_array')) || [];
+    var gems = parseInt(localStorage.getItem('tcg_gems')) || 100;
+    var currentPage = 0;
+    var pHP, cHP, pMax, cMax, pDmg;
+    var forceGodPack = false;
+    var activeEmoji = '🔥';
+    var activeColor = '#ef4444';
+    var packsLeft = 0;
 
     function showPackSelect() { document.getElementById('pack-select').style.display = 'flex'; }
-    function setPackType(emoji) { selectedPackEmoji = emoji; openPack(emoji); }
-    function startBundle(count) { packsRemainingInBundle = count; openPack(selectedPackEmoji); }
-
-    function buyGodPack() {
-        if(gems < 500) return alert("Need 500 Gems!");
-        gems -= 500; forceGodPack = true; openPack('🔱');
+    
+    function selectTheme(emoji, color, id) {
+        activeEmoji = emoji;
+        activeColor = color;
+        var choices = document.querySelectorAll('.pack-choice');
+        for(var i=0; i<choices.length; i++) choices[i].classList.remove('selected');
+        document.getElementById(id).classList.add('selected');
     }
 
-    function openPack(emoji) {
+    function startRip(count) {
+        packsLeft = count;
+        openPack();
+    }
+
+    function buyGodPack() {
+        if(gems < 500) { alert("Need 500 Gems!"); return; }
+        gems -= 500; forceGodPack = true; 
+        activeEmoji = '🔱'; activeColor = '#ffd700';
+        openPack();
+    }
+
+    function openPack() {
         document.getElementById('pack-select').style.display = 'none';
-        document.getElementById('pack-emoji').innerText = emoji;
+        document.getElementById('pack-emoji').innerText = activeEmoji;
+        document.getElementById('current-pack-art').style.background = activeColor;
         document.getElementById('rip-line').style.transform = "none";
         document.getElementById('rip-line').style.opacity = "1";
         document.getElementById('pack-view').style.display = 'flex';
-        document.getElementById('rip-line').onpointerdown = () => {
+        document.getElementById('rip-line').onpointerdown = function() {
             document.getElementById('rip-line').style.transform = "translateX(350px) rotate(40deg)";
             setTimeout(startReveal, 500);
         };
@@ -193,78 +199,74 @@
     function startReveal() {
         document.getElementById('pack-view').style.display = 'none';
         document.getElementById('reveal-view').style.display = 'flex';
-        const stage = document.getElementById('reveal-stage');
+        var stage = document.getElementById('reveal-stage');
         stage.innerHTML = "";
         
-        let pack = [];
-        let isGod = forceGodPack || Math.random() < 0.01;
+        var pack = [];
+        var isGod = forceGodPack || Math.random() < 0.01;
         forceGodPack = false;
 
-        for(let i=0; i<7; i++) {
-            let type;
+        for(var i=0; i<7; i++) {
+            var type;
             if(isGod) {
-                let r = Math.random();
+                var r = Math.random();
                 type = r < 0.6 ? 'Ultra' : (r < 0.9 ? 'Mythic' : 'Legendary');
             } else {
                 type = (i < 4 ? 'Common' : (i < 6 ? 'Energy' : 'Rare'));
                 if(i === 6 && Math.random() < 0.15) type = 'Ultra';
             }
-            
-            // Basic Duplicate Protection: try to find a card not already in the pack
-            let pool = CARD_DB[type];
-            let card = pool[Math.floor(Math.random()*pool.length)];
-            let attempts = 0;
-            while(pack.some(p => p.id === card.id) && attempts < 10) {
-                card = pool[Math.floor(Math.random()*pool.length)];
-                attempts++;
-            }
-            pack.push({...card, r:type});
+            var pool = CARD_DB[type];
+            var card = pool[Math.floor(Math.random()*pool.length)];
+            pack.push(Object.assign({}, card, {r: type}));
         }
 
-        let idx = 0;
+        var idx = 0;
         function next() {
             if(idx >= 7) { 
                 document.getElementById('reveal-view').style.display = 'none'; 
-                if(packsRemainingInBundle > 1) { packsRemainingInBundle--; openPack(selectedPackEmoji); }
-                else { packsRemainingInBundle = 0; showBinder(); }
+                if(packsLeft > 1) { packsLeft--; openPack(); }
+                else { packsLeft = 0; showBinder(); }
                 return; 
             }
-            const div = document.createElement('div');
+            var div = document.createElement('div');
             div.className = "reveal-card";
             div.innerHTML = createCardHTML(pack[idx]);
-            div.onpointerdown = () => {
+            div.onpointerdown = function() {
                 div.classList.add('swiped-up');
                 collection.push(pack[idx]);
                 idx++;
-                setTimeout(() => { div.remove(); next(); }, 400);
+                setTimeout(function() { div.remove(); next(); }, 400);
             };
             stage.appendChild(div);
         }
         next();
     }
 
-    function createCardHTML(c, idx = null) {
-        let rClass = c.r ? c.r.toLowerCase() : 'common';
-        let levelBtn = (idx !== null && c.h > 0) ? `<button class="lvl-btn" onclick="event.stopPropagation(); levelUp(${idx})">Lvl Up (20💎)</button>` : '';
-        return `<div class="card ${rClass}" onclick="selectForBattle(${idx})">
-            <div class="c-header"><span>BASIC</span> <span>${c.h > 0 ? 'HP '+c.h : ''}</span></div>
-            <div class="c-name">${c.n}</div>
-            <div class="c-art">${c.e}</div>
-            <div class="c-body"><b>${c.d > 0 ? 'ATK: '+c.d : 'ENERGY'}</b><br>${levelBtn}</div>
-            <div class="c-footer"><span>${c.id}/120</span> <span>TCG-P</span></div>
-        </div>`;
+    function createCardHTML(c, idx) {
+        var rClass = c.r ? c.r.toLowerCase() : 'common';
+        var hpText = c.h > 0 ? 'HP ' + c.h : '';
+        var atkText = c.d > 0 ? 'ATK: ' + c.d : 'ENERGY';
+        var levelBtn = (idx !== undefined && c.h > 0) ? '<button class="lvl-btn" onclick="event.stopPropagation(); levelUp('+idx+')">Lvl Up (20💎)</button>' : '';
+        
+        return '<div class="card '+rClass+'" onclick="selectForBattle('+(idx !== undefined ? idx : 'null')+')">' +
+            '<div class="c-header"><span>BASIC</span> <span>'+hpText+'</span></div>' +
+            '<div class="c-name">'+c.n+'</div>' +
+            '<div class="c-art">'+c.e+'</div>' +
+            '<div class="c-body"><b>'+atkText+'</b><br>'+levelBtn+'</div>' +
+            '<div class="c-footer"><span>'+c.id+'/120</span> <span>TCG-P</span></div>' +
+        '</div>';
     }
 
     function levelUp(idx) {
-        if(gems < 20) return alert("Need 20 Gems!");
+        if(gems < 20) { alert("Need 20 Gems!"); return; }
         gems -= 20; collection[idx].d += 10; updateStats(); showBinder(); updateArenaSelection();
     }
 
     function openArena() {
-        if(collection.length === 0) return alert("Get cards first!");
+        if(collection.length === 0) { alert("Get cards first!"); return; }
         document.getElementById('battle-arena').style.display = 'flex';
-        let cpuPool = [...CARD_DB.Rare, ...CARD_DB.Ultra, ...CARD_DB.Mythic];
-        let cpu = cpuPool[Math.floor(Math.random()*cpuPool.length)];
+        var cpuPool = CARD_DB.Rare.concat(CARD_DB.Ultra).concat(CARD_DB.Mythic);
+        var cpu = cpuPool[Math.floor(Math.random()*cpuPool.length)];
         cMax = cpu.h; cHP = cpu.h;
         document.getElementById('cpu-arena-card').innerHTML = createCardHTML(cpu);
         document.getElementById('cpu-hp').style.width = "100%";
@@ -272,11 +274,12 @@
     }
 
     function updateArenaSelection() {
-        const zone = document.getElementById('arena-selection-zone');
+        var zone = document.getElementById('arena-selection-zone');
         zone.innerHTML = "";
-        collection.filter(c => c.h > 0).forEach((c, i) => {
-            const actualIndex = collection.indexOf(c);
-            const slot = document.createElement('div');
+        var fighters = collection.filter(function(c) { return c.h > 0; });
+        fighters.forEach(function(c) {
+            var actualIndex = collection.indexOf(c);
+            var slot = document.createElement('div');
             slot.className = "mini-card-slot";
             slot.innerHTML = createCardHTML(c, actualIndex);
             zone.appendChild(slot);
@@ -284,8 +287,9 @@
     }
 
     function selectForBattle(idx) {
-        if(idx === null || document.getElementById('battle-arena').style.display !== 'flex' || collection[idx].h === 0) return;
-        let p = collection[idx];
+        if(idx === null || document.getElementById('battle-arena').style.display !== 'flex') return;
+        var p = collection[idx];
+        if(p.h === 0) return;
         pMax = p.h; pHP = p.h; pDmg = p.d;
         document.getElementById('player-arena-card').innerHTML = createCardHTML(p);
         document.getElementById('player-hp').style.width = "100%";
@@ -296,7 +300,7 @@
         cHP -= pDmg;
         document.getElementById('cpu-hp').style.width = Math.max(0, (cHP/cMax*100)) + "%";
         if(cHP <= 0) { alert("Victory! +50 Gems"); gems+=50; return closeArena(); }
-        setTimeout(() => {
+        setTimeout(function() {
             pHP -= 30;
             document.getElementById('player-hp').style.width = Math.max(0, (pHP/pMax*100)) + "%";
             if(pHP <= 0) { alert("Defeat!"); return closeArena(); }
@@ -306,12 +310,14 @@
     function closeArena() { document.getElementById('battle-arena').style.display = 'none'; updateStats(); }
 
     function showBinder() {
-        const display = document.getElementById('main-display');
+        var display = document.getElementById('main-display');
         display.innerHTML = "";
-        const filter = document.getElementById('type-filter').value;
-        let filtered = filter === 'all' ? collection : collection.filter(c => c.r === filter);
-        filtered.slice(currentPage*6, (currentPage*6)+6).forEach((c, i) => {
-            const slot = document.createElement('div');
+        var filter = document.getElementById('type-filter').value;
+        var filtered = filter === 'all' ? collection : collection.filter(function(c) { return c.r === filter; });
+        var pageCards = filtered.slice(currentPage*6, (currentPage*6)+6);
+        
+        pageCards.forEach(function(c) {
+            var slot = document.createElement('div');
             slot.className = "binder-slot";
             slot.innerHTML = createCardHTML(c, collection.indexOf(c));
             display.appendChild(slot);
