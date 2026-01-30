@@ -14,48 +14,55 @@
         header { width: 100%; padding: 15px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; z-index: 100; border-bottom: 2px solid #333; box-sizing: border-box; align-items: center; }
         .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 13px; }
 
+        /* BATTLE ARENA */
+        #battle-arena { position: fixed; inset: 0; background: #0b0e14; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; overflow-y: auto; }
+        .arena-card { width: 130px; height: 180px; position: relative; transition: 0.2s; flex-shrink: 0; }
+        .hp-bg { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-bottom: 5px; border: 1px solid #444; }
+        .hp-bar { height: 100%; background: #22c55e; transition: 0.3s; width: 100%; }
+        #arena-selection-zone { width: 100%; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; margin-top: 10px; display: flex; gap: 10px; overflow-x: auto; min-height: 160px; border-top: 1px solid #333; }
+        .mini-card-slot { width: 90px; height: 130px; flex-shrink: 0; transform: scale(0.9); }
+
+        /* PACK SELECT */
         #pack-select { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
         .pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .pack-choice { width: 85px; height: 120px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid white; position: relative; }
 
+        /* PACK OPENING */
         #pack-view { position: fixed; inset: 0; background: radial-gradient(circle, #2e3a59 0%, #0b0e14 100%); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .pack-wrapper { width: 240px; height: 360px; position: relative; display: flex; justify-content: center; }
-        .pack-art { width: 100%; height: 100%; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 5px solid white; position: relative; overflow: hidden; background: #222; }
-        .pack-top-rip { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: #b91c1c; border-bottom: 4px dashed rgba(255,255,255,0.6); border-radius: 15px 15px 0 0; transition: transform 0.6s; z-index: 10; cursor: pointer; }
+        .pack-wrapper { width: 220px; height: 320px; position: relative; }
+        .pack-art { width: 100%; height: 100%; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 5px solid white; overflow: hidden; }
+        .pack-top-rip { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: #b91c1c; border-bottom: 4px dashed rgba(255,255,255,0.6); border-radius: 15px 15px 0 0; transition: transform 0.4s; z-index: 10; cursor: pointer; }
         
+        /* REVEAL FIX: Not squished */
         #reveal-view { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
         .reveal-stage { width: 240px; height: 340px; position: relative; }
-        .reveal-card { position: absolute; inset: 0; transition: 0.6s; }
-        .swiped-up { transform: translateY(-150vh) rotate(-10deg) !important; opacity: 0; }
+        .reveal-card { position: absolute; inset: 0; transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .swiped-up { transform: translateY(-120vh) rotate(-5deg) !important; opacity: 0; }
 
-        .card { width: 100%; height: 100%; background: #fff; border: 6px solid #d1d5db; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color: #111; position: relative; font-size: 8px; }
-        
-        /* HOLOGRAPHIC SHINE EFFECT */
-        .holo-layer { 
-            position: absolute; inset: 0; pointer-events: none; opacity: 0;
-            background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.3) 55%, transparent 75%);
-            background-size: 200% 200%; transition: opacity 0.3s; z-index: 5;
-        }
+        /* CARDS */
+        .card { width: 100%; height: 100%; background: #fff; border: 5px solid #d1d5db; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color: #111; position: relative; font-size: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .holo-layer { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.4) 55%, transparent 80%); background-size: 200% 200%; z-index: 5; }
         .ultra .holo-layer, .mythic .holo-layer, .legendary .holo-layer { opacity: 0.5; }
         
         .card.rare { border-color: var(--rare); background: #fffdf5; }
-        .card.ultra { border-color: var(--ultra); box-shadow: 0 0 10px var(--ultra); }
-        .card.mythic { border-color: #ff00ff; box-shadow: 0 0 15px #ff00ff; }
-        .card.legendary { border-image: var(--legend) 1; border-width: 6px; border-style: solid; }
+        .card.ultra { border-color: var(--ultra); }
+        .card.mythic { border-color: #ff00ff; }
+        .card.legendary { border-image: var(--legend) 1; border-width: 5px; border-style: solid; }
         
         .c-header { padding: 4px; display: flex; justify-content: space-between; font-weight: bold; }
-        .c-name { padding: 2px 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #ddd; }
-        .c-art { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 60px; background: #eee; margin: 3px; border-radius: 4px; }
+        .c-name { padding: 2px 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #ddd; text-align: left; }
+        .c-art { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #eee; margin: 3px; border-radius: 4px; }
         .c-body { padding: 3px; flex-grow: 1; text-align: center; }
         .c-footer { font-size: 6px; padding: 2px 5px; display: flex; justify-content: space-between; background: #f8fafc; }
 
-        #binder-frame { background: #1e293b; border: 10px solid #0f172a; border-radius: 20px; padding: 15px; margin-top: 10px; width: 90%; max-width: 350px; min-height: 450px; box-sizing: border-box; }
-        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
-        .binder-slot { height: 210px; }
+        .lvl-btn { background: var(--gem); color: white; border: none; font-size: 8px; padding: 2px 5px; border-radius: 4px; margin-top: 2px; }
 
-        .bundle-row { display: flex; gap: 8px; margin-top: 10px; width: 90%; }
-        .bundle-btn { background: #475569; color: white; border: 2px solid #94a3b8; padding: 10px; border-radius: 10px; font-size: 12px; cursor: pointer; flex: 1; font-weight: bold; }
-        #save-btn { margin-top: 10px; color: #aaa; font-size: 10px; background: none; border: none; text-decoration: underline; }
+        /* BINDER */
+        #binder-frame { background: #1e293b; border: 8px solid #0f172a; border-radius: 20px; padding: 12px; margin-top: 10px; width: 95%; max-width: 340px; min-height: 420px; box-sizing: border-box; }
+        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+        .binder-slot { height: 190px; }
+
+        #save-btn { margin-top: 10px; color: #777; font-size: 10px; background: none; border: none; text-decoration: underline; padding-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -63,10 +70,28 @@
 <header>
     <div style="color:var(--gem); font-weight:bold;">💎 <span id="gem-count">100</span></div>
     <button class="btn" onclick="showPackSelect()">🎁 GET PACKS</button>
+    <button class="btn" style="background:#22c55e" onclick="openArena()">⚔️ FIGHT</button>
 </header>
 
+<div id="battle-arena">
+    <div id="cpu-side" style="width:140px">
+        <div class="hp-bg"><div id="cpu-hp" class="hp-bar"></div></div>
+        <div id="cpu-arena-card" class="arena-card"></div>
+    </div>
+    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:13px;">Choose a fighter!</div>
+    <div id="player-side" style="width:140px">
+        <div id="player-arena-card" class="arena-card"></div>
+        <div class="hp-bg" style="margin-top:5px;"><div id="player-hp" class="hp-bar"></div></div>
+    </div>
+    <div style="display:flex; gap:10px; margin: 10px 0;">
+        <button id="atk-btn" class="btn" style="display:none; background:red;" onclick="attack()">ATTACK!</button>
+        <button class="btn" style="background:#444;" onclick="closeArena()">CLOSE</button>
+    </div>
+    <div id="arena-selection-zone"></div>
+</div>
+
 <div id="pack-select">
-    <h2 style="color:white; margin:5px;">Select Pack</h2>
+    <h2 style="color:white; margin:5px; font-size:18px;">Get Cards</h2>
     <div class="pack-grid">
         <div class="pack-choice" style="background:#ef4444;" onclick="buySingle('🔥', '#ef4444')">🔥</div>
         <div class="pack-choice" style="background:#3b82f6;" onclick="buySingle('💧', '#3b82f6')">💧</div>
@@ -75,14 +100,7 @@
         <div class="pack-choice" style="background:#a855f7;" onclick="buySingle('🔮', '#a855f7')">🔮</div>
         <div class="pack-choice" style="background:#64748b;" onclick="buySingle('⚙️', '#64748b')">⚙️</div>
     </div>
-    
-    <div style="margin-top:15px; color:#94a3b8; font-size:12px; font-weight:bold;">MULTI-RIP BUNDLES</div>
-    <div class="bundle-row">
-        <button class="bundle-btn" onclick="startBundle(3)">RIP 3 PACKS</button>
-        <button class="bundle-btn" onclick="startBundle(5)">RIP 5 PACKS</button>
-    </div>
-
-    <button class="btn" style="margin-top:15px; background:var(--legend); border:1px solid gold; width:220px" onclick="buyGodPack()">🔱 GOD PACK (500💎)</button>
+    <button class="btn" style="margin-top:15px; background:var(--legend); border:1px solid gold; width:200px" onclick="buyGodPack()">🔱 GOD PACK (500💎)</button>
     <button class="btn" style="margin-top:10px; background:#444;" onclick="document.getElementById('pack-select').style.display='none'">BACK</button>
 </div>
 
@@ -97,7 +115,7 @@
 
 <div id="binder-frame"><div id="main-display"></div></div>
 
-<div style="margin:15px; display:flex; gap:20px; align-items:center;">
+<div style="margin:10px; display:flex; gap:15px; align-items:center;">
     <button class="btn" onclick="prevPage()">⬅️</button>
     <span id="page-indicator">Page 1</span>
     <button class="btn" onclick="nextPage()">➡️</button>
@@ -118,25 +136,12 @@
     var collection = JSON.parse(localStorage.getItem('tcg_binder_array')) || [];
     var gems = parseInt(localStorage.getItem('tcg_gems')) || 100;
     var currentPage = 0;
-    var packsLeft = 0;
-    var currentEmoji = '🔥';
-    var currentColor = '#ef4444';
-    var forceGod = false;
+    var currentEmoji = '🔥', currentColor = '#ef4444', forceGod = false;
+    var pHP, cHP, pMax, cMax, pDmg;
 
     function showPackSelect() { document.getElementById('pack-select').style.display = 'flex'; }
-
-    function buySingle(emoji, color) {
-        currentEmoji = emoji; currentColor = color; packsLeft = 1; openPack();
-    }
-
-    function startBundle(count) {
-        packsLeft = count; openPack();
-    }
-
-    function buyGodPack() {
-        if(gems < 500) { alert("Need 500 Gems!"); return; }
-        gems -= 500; forceGod = true; currentEmoji = '🔱'; currentColor = '#ffd700'; packsLeft = 1; openPack();
-    }
+    function buySingle(emoji, color) { currentEmoji = emoji; currentColor = color; openPack(); }
+    function buyGodPack() { if(gems < 500) { alert("Need 500 Gems!"); return; } gems -= 500; forceGod = true; currentEmoji = '🔱'; currentColor = '#ffd700'; openPack(); }
 
     function openPack() {
         document.getElementById('pack-select').style.display = 'none';
@@ -173,8 +178,7 @@
         function next() {
             if(idx >= 7) {
                 document.getElementById('reveal-view').style.display = 'none';
-                if(--packsLeft > 0) openPack();
-                else showBinder();
+                showBinder();
                 return;
             }
             var div = document.createElement('div');
@@ -193,15 +197,64 @@
 
     function createCardHTML(c, idx) {
         var rClass = (c.r || 'common').toLowerCase();
-        return '<div class="card '+rClass+'">' +
+        var levelBtn = (idx !== undefined && c.h > 0) ? '<button class="lvl-btn" onclick="event.stopPropagation(); levelUp('+idx+')">Lvl Up (20💎)</button>' : '';
+        return '<div class="card '+rClass+'" onclick="selectForBattle('+idx+')">' +
             '<div class="holo-layer"></div>' +
             '<div class="c-header"><span>BASIC</span> <span>'+(c.h > 0 ? 'HP '+c.h : '')+'</span></div>' +
             '<div class="c-name">'+c.n+'</div>' +
             '<div class="c-art">'+c.e+'</div>' +
-            '<div class="c-body"><b>'+(c.d > 0 ? 'ATK: '+c.d : 'ENERGY')+'</b></div>' +
-            '<div class="c-footer"><span>'+c.id+'/120</span></div>' +
+            '<div class="c-body"><b>'+(c.d > 0 ? 'ATK: '+c.d : 'ENERGY')+'</b><br>'+levelBtn+'</div>' +
+            '<div class="c-footer"><span>ID:'+c.id+'</span></div>' +
         '</div>';
     }
+
+    function openArena() {
+        if(collection.length === 0) { alert("Get cards first!"); return; }
+        document.getElementById('battle-arena').style.display = 'flex';
+        var cpuPool = CARD_DB.Rare.concat(CARD_DB.Ultra);
+        var cpu = cpuPool[Math.floor(Math.random()*cpuPool.length)];
+        cMax = cpu.h; cHP = cpu.h;
+        document.getElementById('cpu-arena-card').innerHTML = createCardHTML(cpu);
+        document.getElementById('cpu-hp').style.width = "100%";
+        updateArenaSelection();
+    }
+
+    function updateArenaSelection() {
+        var zone = document.getElementById('arena-selection-zone');
+        zone.innerHTML = "";
+        collection.forEach(function(c, i) {
+            if(c.h > 0) {
+                var slot = document.createElement('div');
+                slot.className = "mini-card-slot";
+                slot.innerHTML = createCardHTML(c, i);
+                zone.appendChild(slot);
+            }
+        });
+    }
+
+    function selectForBattle(idx) {
+        if(idx === undefined || isNaN(idx)) return;
+        var p = collection[idx];
+        pMax = p.h; pHP = p.h; pDmg = p.d;
+        document.getElementById('player-arena-card').innerHTML = createCardHTML(p);
+        document.getElementById('player-hp').style.width = "100%";
+        document.getElementById('atk-btn').style.display = "block";
+    }
+
+    function attack() {
+        cHP -= pDmg;
+        document.getElementById('cpu-hp').style.width = Math.max(0, (cHP/cMax*100)) + "%";
+        if(cHP <= 0) { alert("Win! +50💎"); gems+=50; return closeArena(); }
+        setTimeout(function() {
+            pHP -= 30;
+            document.getElementById('player-hp').style.width = Math.max(0, (pHP/pMax*100)) + "%";
+            if(pHP <= 0) { alert("Lost!"); return closeArena(); }
+        }, 500);
+    }
+
+    function closeArena() { document.getElementById('battle-arena').style.display = 'none'; updateStats(); }
+
+    function levelUp(idx) { if(gems >= 20) { gems -= 20; collection[idx].d += 10; updateStats(); showBinder(); } }
 
     function showBinder() {
         var display = document.getElementById('main-display');
@@ -210,7 +263,7 @@
         page.forEach(function(c){
             var slot = document.createElement('div');
             slot.className = "binder-slot";
-            slot.innerHTML = createCardHTML(c);
+            slot.innerHTML = createCardHTML(c, collection.indexOf(c));
             display.appendChild(slot);
         });
         document.getElementById('page-indicator').innerText = "Page " + (currentPage + 1);
@@ -225,18 +278,14 @@
 
     function exportData() {
         var data = btoa(JSON.stringify({g:gems, c:collection}));
-        prompt("Copy this code to save your progress:", data);
+        prompt("Save code:", data);
     }
 
-    // HOLOGRAPHIC TILT LOGIC
     window.addEventListener('deviceorientation', function(event) {
-        var x = event.beta;  // -180 to 180
-        var y = event.gamma; // -90 to 90
+        var y = event.gamma; 
         var layers = document.querySelectorAll('.holo-layer');
         var pos = (y * 2) + 50; 
-        for(var i=0; i<layers.length; i++) {
-            layers[i].style.backgroundPosition = pos + "% " + pos + "%";
-        }
+        for(var i=0; i<layers.length; i++) { layers[i].style.backgroundPosition = pos + "% " + pos + "%"; }
     });
 
     function nextPage() { if((currentPage+1)*6 < collection.length) { currentPage++; showBinder(); } }
