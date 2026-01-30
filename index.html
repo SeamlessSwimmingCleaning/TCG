@@ -8,63 +8,54 @@
     <title>JUST TCG pocket</title>
     <style>
         :root { --bg: #0b0e14; --card: #1c2331; --rare: #ffcc00; --ultra: #00f2ff; --mythic: #ff00ff; --legend: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); --accent: #ff0055; --gem: #a855f7; --gold: #ffd700; }
-        
-        /* Fix for iOS 12 tap delay and scrolling */
-        * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-
-        body { background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; }
+        * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; }
+        body { background: var(--bg); color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; overflow-x: hidden; }
         
         header { width: 100%; padding: 15px; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; z-index: 100; border-bottom: 2px solid #333; box-sizing: border-box; align-items: center; }
         .btn { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 13px; }
 
-        #battle-arena { position: fixed; inset: 0; background: #0b0e14; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; overflow-y: auto; }
-        .arena-card { width: 130px; height: 180px; position: relative; transition: 0.2s; flex-shrink: 0; }
-        .hp-bg { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-bottom: 5px; border: 1px solid #444; }
-        .hp-bar { height: 100%; background: #22c55e; transition: 0.3s; width: 100%; }
-        
-        #arena-selection-zone { width: 100%; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; margin-top: 10px; display: flex; gap: 10px; overflow-x: auto; min-height: 160px; border-top: 1px solid #333; }
-        .mini-card-slot { width: 90px; height: 130px; flex-shrink: 0; transform: scale(0.9); transition: 0.2s; }
-
         #pack-select { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
         .pack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .pack-choice { width: 85px; height: 120px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid white; position: relative; transition: 0.2s; }
-        .pack-choice.selected { border-color: var(--ultra); box-shadow: 0 0 15px var(--ultra); transform: scale(1.05); }
+        .pack-choice { width: 85px; height: 120px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; border: 3px solid white; position: relative; }
 
         #pack-view { position: fixed; inset: 0; background: radial-gradient(circle, #2e3a59 0%, #0b0e14 100%); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
         .pack-wrapper { width: 240px; height: 360px; position: relative; display: flex; justify-content: center; }
-        .pack-art { width: 100%; height: 100%; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 80px; border: 5px solid white; position: relative; overflow: hidden; background: #222; box-sizing: border-box; }
-        .pack-top-rip { position: absolute; top: 0; left: 0; width: 100%; height: 50px; background: #b91c1c; border-bottom: 4px dashed rgba(255,255,255,0.6); border-radius: 15px 15px 0 0; transition: transform 0.6s; z-index: 10; box-sizing: border-box; pointer-events: auto; }
+        .pack-art { width: 100%; height: 100%; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 5px solid white; position: relative; overflow: hidden; background: #222; }
+        .pack-top-rip { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: #b91c1c; border-bottom: 4px dashed rgba(255,255,255,0.6); border-radius: 15px 15px 0 0; transition: transform 0.6s; z-index: 10; cursor: pointer; }
         
         #reveal-view { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
         .reveal-stage { width: 240px; height: 340px; position: relative; }
-        .reveal-card { position: absolute; inset: 0; transition: 0.6s; cursor: ns-resize; }
+        .reveal-card { position: absolute; inset: 0; transition: 0.6s; }
         .swiped-up { transform: translateY(-150vh) rotate(-10deg) !important; opacity: 0; }
 
-        .card { width: 100%; height: 100%; background: #fff; border: 6px solid #d1d5db; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color: #111; box-sizing: border-box; position: relative; font-size: 8px; }
-        .card.rare { border-color: var(--rare); background: #fffdf5; }
-        .card.ultra { border-color: var(--ultra); box-shadow: 0 0 15px var(--ultra); }
-        .card.mythic { border-color: #ff00ff; box-shadow: 0 0 20px #ff00ff; }
-        .card.legendary { border-image: var(--legend) 1; border-width: 6px; border-style: solid; animation: rainbow-glow 3s infinite linear; }
-        .card.energy { background: #cbd5e1; border-color: #475569; }
+        .card { width: 100%; height: 100%; background: #fff; border: 6px solid #d1d5db; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color: #111; position: relative; font-size: 8px; }
         
-        @keyframes rainbow-glow { 0% { box-shadow: 0 0 10px red; } 50% { box-shadow: 0 0 30px blue; } 100% { box-shadow: 0 0 10px red; } }
+        /* HOLOGRAPHIC SHINE EFFECT */
+        .holo-layer { 
+            position: absolute; inset: 0; pointer-events: none; opacity: 0;
+            background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,0.3) 45%, rgba(255,255,255,0.3) 55%, transparent 75%);
+            background-size: 200% 200%; transition: opacity 0.3s; z-index: 5;
+        }
+        .ultra .holo-layer, .mythic .holo-layer, .legendary .holo-layer { opacity: 0.5; }
+        
+        .card.rare { border-color: var(--rare); background: #fffdf5; }
+        .card.ultra { border-color: var(--ultra); box-shadow: 0 0 10px var(--ultra); }
+        .card.mythic { border-color: #ff00ff; box-shadow: 0 0 15px #ff00ff; }
+        .card.legendary { border-image: var(--legend) 1; border-width: 6px; border-style: solid; }
         
         .c-header { padding: 4px; display: flex; justify-content: space-between; font-weight: bold; }
-        .c-name { padding: 1px 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #ddd; }
-        .c-art { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 60px; background: #eee; margin: 3px; border-radius: 4px; border: 1px solid #ddd; }
+        .c-name { padding: 2px 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #ddd; }
+        .c-art { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 60px; background: #eee; margin: 3px; border-radius: 4px; }
         .c-body { padding: 3px; flex-grow: 1; text-align: center; }
-        .c-footer { font-size: 6px; padding: 2px 5px; display: flex; justify-content: space-between; background: #f8fafc; border-top: 1px solid #eee; }
+        .c-footer { font-size: 6px; padding: 2px 5px; display: flex; justify-content: space-between; background: #f8fafc; }
 
-        .lvl-btn { background: var(--gem); color: white; border: none; font-size: 8px; padding: 1px 4px; border-radius: 4px; cursor: pointer; margin-top: 2px; }
+        #binder-frame { background: #1e293b; border: 10px solid #0f172a; border-radius: 20px; padding: 15px; margin-top: 10px; width: 90%; max-width: 350px; min-height: 450px; box-sizing: border-box; }
+        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+        .binder-slot { height: 210px; }
 
-        #binder-frame { background: #1e293b; border: 10px solid #0f172a; border-radius: 20px; padding: 15px; margin-top: 10px; width: 90%; max-width: 400px; min-height: 480px; box-sizing: border-box; }
-        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
-        .binder-slot { height: 230px; }
-        
-        #type-filter { margin: 10px 0; padding: 8px; border-radius: 8px; background: #333; color: white; border: 1px solid #555; width: 90%; max-width: 400px; }
-        
-        .bundle-row { display: flex; gap: 10px; margin-top: 10px; }
-        .bundle-btn { background: #475569; color: white; border: 2px solid #94a3b8; padding: 8px; border-radius: 10px; font-size: 11px; cursor: pointer; flex: 1; font-weight: bold; }
+        .bundle-row { display: flex; gap: 8px; margin-top: 10px; width: 90%; }
+        .bundle-btn { background: #475569; color: white; border: 2px solid #94a3b8; padding: 10px; border-radius: 10px; font-size: 12px; cursor: pointer; flex: 1; font-weight: bold; }
+        #save-btn { margin-top: 10px; color: #aaa; font-size: 10px; background: none; border: none; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -72,52 +63,23 @@
 <header>
     <div style="color:var(--gem); font-weight:bold;">💎 <span id="gem-count">100</span></div>
     <button class="btn" onclick="showPackSelect()">🎁 GET PACKS</button>
-    <button class="btn" style="background:#22c55e" onclick="openArena()">⚔️ FIGHT</button>
 </header>
-
-<select id="type-filter" onchange="showBinder()">
-    <option value="all">Organize: All Cards</option>
-    <option value="Common">Common</option>
-    <option value="Rare">Rare</option>
-    <option value="Ultra">Ultra Rare</option>
-    <option value="Mythic">Mythic</option>
-    <option value="Legendary">Legendary</option>
-    <option value="Energy">Energy</option>
-</select>
-
-<div id="battle-arena">
-    <div id="cpu-side" style="width:150px">
-        <div class="hp-bg"><div id="cpu-hp" class="hp-bar"></div></div>
-        <div id="cpu-arena-card" class="arena-card"></div>
-    </div>
-    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:14px;">Select fighter!</div>
-    <div id="player-side" style="width:150px">
-        <div id="player-arena-card" class="arena-card"></div>
-        <div class="hp-bg" style="margin-top:5px;"><div id="player-hp" class="hp-bar"></div></div>
-    </div>
-    <div style="display:flex; gap:10px; margin: 10px 0;">
-        <button id="atk-btn" class="btn" style="display:none; background:red;" onclick="attack()">ATTACK!</button>
-        <button class="btn" style="background:#444;" onclick="closeArena()">CLOSE</button>
-    </div>
-    <div id="arena-selection-zone"></div>
-</div>
 
 <div id="pack-select">
     <h2 style="color:white; margin:5px;">Select Pack</h2>
     <div class="pack-grid">
-        <div class="pack-choice" id="p-fire" style="background:#ef4444;" onclick="selectTheme('🔥', '#ef4444', 'p-fire')">🔥</div>
-        <div class="pack-choice" id="p-water" style="background:#3b82f6;" onclick="selectTheme('💧', '#3b82f6', 'p-water')">💧</div>
-        <div class="pack-choice" id="p-grass" style="background:#22c55e;" onclick="selectTheme('🍃', '#22c55e', 'p-grass')">🍃</div>
-        <div class="pack-choice" id="p-bolt" style="background:#eab308;" onclick="selectTheme('⚡', '#eab308', 'p-bolt')">⚡</div>
-        <div class="pack-choice" id="p-void" style="background:#a855f7;" onclick="selectTheme('🔮', '#a855f7', 'p-void')">🔮</div>
-        <div class="pack-choice" id="p-steel" style="background:#64748b;" onclick="selectTheme('⚙️', '#64748b', 'p-steel')">⚙️</div>
+        <div class="pack-choice" style="background:#ef4444;" onclick="buySingle('🔥', '#ef4444')">🔥</div>
+        <div class="pack-choice" style="background:#3b82f6;" onclick="buySingle('💧', '#3b82f6')">💧</div>
+        <div class="pack-choice" style="background:#22c55e;" onclick="buySingle('🍃', '#22c55e')">🍃</div>
+        <div class="pack-choice" style="background:#eab308;" onclick="buySingle('⚡', '#eab308')">⚡</div>
+        <div class="pack-choice" style="background:#a855f7;" onclick="buySingle('🔮', '#a855f7')">🔮</div>
+        <div class="pack-choice" style="background:#64748b;" onclick="buySingle('⚙️', '#64748b')">⚙️</div>
     </div>
     
-    <div style="margin-top:15px; color:#94a3b8; font-size:12px; font-weight:bold;">CHOOSE QUANTITY</div>
+    <div style="margin-top:15px; color:#94a3b8; font-size:12px; font-weight:bold;">MULTI-RIP BUNDLES</div>
     <div class="bundle-row">
-        <button class="bundle-btn" onclick="startRip(1)">1 PACK</button>
-        <button class="bundle-btn" onclick="startRip(3)">3 PACKS</button>
-        <button class="bundle-btn" onclick="startRip(5)">5 PACKS</button>
+        <button class="bundle-btn" onclick="startBundle(3)">RIP 3 PACKS</button>
+        <button class="bundle-btn" onclick="startBundle(5)">RIP 5 PACKS</button>
     </div>
 
     <button class="btn" style="margin-top:15px; background:var(--legend); border:1px solid gold; width:220px" onclick="buyGodPack()">🔱 GOD PACK (500💎)</button>
@@ -127,7 +89,7 @@
 <div id="pack-view">
     <div class="pack-wrapper">
         <div class="pack-art" id="current-pack-art"><div id="pack-emoji">🔥</div></div>
-        <div class="pack-top-rip" id="rip-line"></div>
+        <div class="pack-top-rip" id="rip-line" onmousedown="ripPack()" ontouchstart="ripPack()"></div>
     </div>
 </div>
 
@@ -141,59 +103,52 @@
     <button class="btn" onclick="nextPage()">➡️</button>
 </div>
 
+<button id="save-btn" onclick="exportData()">Copy Save Data Code</button>
+
 <script>
-    // iOS 12 Friendly Script
     var CARD_DB = {
-        Common: [{n:"Leafur", e:"🍃", h:60, d:20, id:1}, {n:"Embear", e:"🔥", h:60, d:30, id:2}, {n:"Bubbles", e:"💧", h:50, d:20, id:3}, {n:"Cinder-Cat", e:"🐱", h:55, d:35, id:4}, {n:"Stone-Pup", e:"🐶", h:70, d:15, id:5}],
-        Rare: [{n:"Vine-Serp", e:"🐍", h:120, d:50, id:20}, {n:"Blaze-Wolf", e:"🐺", h:120, d:60, id:21}, {n:"Giga-Golem", e:"🗿", h:150, d:40, id:22}, {n:"Snow-Owl", e:"🦉", h:110, d:45, id:23}, {n:"Volt-Fox", e:"🦊", h:105, d:65, id:27}],
-        Ultra: [{n:"ZENITH", e:"🐉", h:220, d:130, id:50}, {n:"TITAN", e:"⚡", h:200, d:110, id:51}, {n:"Frost-Giant", e:"❄️", h:240, d:100, id:54}],
-        Mythic: [{n:"STAR-HORSE", e:"🐎", h:300, d:180, id:70}, {n:"PHOENIX", e:"🐦", h:280, d:200, id:71}, {n:"HYDRA", e:"🐉", h:350, d:160, id:73}],
-        Legendary: [{n:"GOD-EYE", e:"👁️", h:500, d:350, id:99}, {n:"SUN-KING", e:"☀️", h:600, d:300, id:100}],
-        Energy: [{n:"Fire En", e:"🔥", h:0, d:0, id:"E1"}, {n:"Water En", e:"💧", h:0, d:0, id:"E2"}, {n:"Leaf En", e:"🍃", h:0, d:0, id:"E3"}]
+        Common: [{n:"Leafur", e:"🍃", h:60, d:20, id:1}, {n:"Embear", e:"🔥", h:60, d:30, id:2}, {n:"Bubbles", e:"💧", h:50, d:20, id:3}],
+        Rare: [{n:"Vine-Serp", e:"🐍", h:120, d:50, id:20}, {n:"Blaze-Wolf", e:"🐺", h:120, d:60, id:21}, {n:"Snow-Owl", e:"🦉", h:110, d:45, id:23}],
+        Ultra: [{n:"ZENITH", e:"🐉", h:220, d:130, id:50}, {n:"TITAN", e:"⚡", h:200, d:110, id:51}],
+        Mythic: [{n:"STAR-HORSE", e:"🐎", h:300, d:180, id:70}, {n:"PHOENIX", e:"🐦", h:280, d:200, id:71}],
+        Legendary: [{n:"GOD-EYE", e:"👁️", h:500, d:350, id:99}],
+        Energy: [{n:"Fire En", e:"🔥", h:0, d:0, id:"E1"}, {n:"Water En", e:"💧", h:0, d:0, id:"E2"}]
     };
 
     var collection = JSON.parse(localStorage.getItem('tcg_binder_array')) || [];
     var gems = parseInt(localStorage.getItem('tcg_gems')) || 100;
     var currentPage = 0;
-    var pHP, cHP, pMax, cMax, pDmg;
-    var forceGodPack = false;
-    var activeEmoji = '🔥';
-    var activeColor = '#ef4444';
     var packsLeft = 0;
+    var currentEmoji = '🔥';
+    var currentColor = '#ef4444';
+    var forceGod = false;
 
     function showPackSelect() { document.getElementById('pack-select').style.display = 'flex'; }
-    
-    function selectTheme(emoji, color, id) {
-        activeEmoji = emoji;
-        activeColor = color;
-        var choices = document.querySelectorAll('.pack-choice');
-        for(var i=0; i<choices.length; i++) choices[i].classList.remove('selected');
-        document.getElementById(id).classList.add('selected');
+
+    function buySingle(emoji, color) {
+        currentEmoji = emoji; currentColor = color; packsLeft = 1; openPack();
     }
 
-    function startRip(count) {
-        packsLeft = count;
-        openPack();
+    function startBundle(count) {
+        packsLeft = count; openPack();
     }
 
     function buyGodPack() {
         if(gems < 500) { alert("Need 500 Gems!"); return; }
-        gems -= 500; forceGodPack = true; 
-        activeEmoji = '🔱'; activeColor = '#ffd700';
-        openPack();
+        gems -= 500; forceGod = true; currentEmoji = '🔱'; currentColor = '#ffd700'; packsLeft = 1; openPack();
     }
 
     function openPack() {
         document.getElementById('pack-select').style.display = 'none';
-        document.getElementById('pack-emoji').innerText = activeEmoji;
-        document.getElementById('current-pack-art').style.background = activeColor;
+        document.getElementById('pack-emoji').innerText = currentEmoji;
+        document.getElementById('current-pack-art').style.background = currentColor;
         document.getElementById('rip-line').style.transform = "none";
-        document.getElementById('rip-line').style.opacity = "1";
         document.getElementById('pack-view').style.display = 'flex';
-        document.getElementById('rip-line').onpointerdown = function() {
-            document.getElementById('rip-line').style.transform = "translateX(350px) rotate(40deg)";
-            setTimeout(startReveal, 500);
-        };
+    }
+
+    function ripPack() {
+        document.getElementById('rip-line').style.transform = "translateY(-100px) rotate(-10deg)";
+        setTimeout(startReveal, 400);
     }
 
     function startReveal() {
@@ -203,39 +158,33 @@
         stage.innerHTML = "";
         
         var pack = [];
-        var isGod = forceGodPack || Math.random() < 0.01;
-        forceGodPack = false;
+        var isGod = forceGod || Math.random() < 0.01;
+        forceGod = false;
 
         for(var i=0; i<7; i++) {
-            var type;
-            if(isGod) {
-                var r = Math.random();
-                type = r < 0.6 ? 'Ultra' : (r < 0.9 ? 'Mythic' : 'Legendary');
-            } else {
-                type = (i < 4 ? 'Common' : (i < 6 ? 'Energy' : 'Rare'));
-                if(i === 6 && Math.random() < 0.15) type = 'Ultra';
-            }
+            var type = (i<4) ? 'Common' : (i<6 ? 'Energy' : 'Rare');
+            if(isGod) type = (Math.random() < 0.6) ? 'Ultra' : 'Mythic';
+            if(i === 6 && Math.random() < 0.1) type = 'Ultra';
             var pool = CARD_DB[type];
-            var card = pool[Math.floor(Math.random()*pool.length)];
-            pack.push(Object.assign({}, card, {r: type}));
+            pack.push(Object.assign({}, pool[Math.floor(Math.random()*pool.length)], {r:type}));
         }
 
         var idx = 0;
         function next() {
-            if(idx >= 7) { 
-                document.getElementById('reveal-view').style.display = 'none'; 
-                if(packsLeft > 1) { packsLeft--; openPack(); }
-                else { packsLeft = 0; showBinder(); }
-                return; 
+            if(idx >= 7) {
+                document.getElementById('reveal-view').style.display = 'none';
+                if(--packsLeft > 0) openPack();
+                else showBinder();
+                return;
             }
             var div = document.createElement('div');
             div.className = "reveal-card";
             div.innerHTML = createCardHTML(pack[idx]);
-            div.onpointerdown = function() {
+            div.onmousedown = div.ontouchstart = function() {
                 div.classList.add('swiped-up');
                 collection.push(pack[idx]);
                 idx++;
-                setTimeout(function() { div.remove(); next(); }, 400);
+                setTimeout(function(){ div.remove(); next(); }, 400);
             };
             stage.appendChild(div);
         }
@@ -243,83 +192,25 @@
     }
 
     function createCardHTML(c, idx) {
-        var rClass = c.r ? c.r.toLowerCase() : 'common';
-        var hpText = c.h > 0 ? 'HP ' + c.h : '';
-        var atkText = c.d > 0 ? 'ATK: ' + c.d : 'ENERGY';
-        var levelBtn = (idx !== undefined && c.h > 0) ? '<button class="lvl-btn" onclick="event.stopPropagation(); levelUp('+idx+')">Lvl Up (20💎)</button>' : '';
-        
-        return '<div class="card '+rClass+'" onclick="selectForBattle('+(idx !== undefined ? idx : 'null')+')">' +
-            '<div class="c-header"><span>BASIC</span> <span>'+hpText+'</span></div>' +
+        var rClass = (c.r || 'common').toLowerCase();
+        return '<div class="card '+rClass+'">' +
+            '<div class="holo-layer"></div>' +
+            '<div class="c-header"><span>BASIC</span> <span>'+(c.h > 0 ? 'HP '+c.h : '')+'</span></div>' +
             '<div class="c-name">'+c.n+'</div>' +
             '<div class="c-art">'+c.e+'</div>' +
-            '<div class="c-body"><b>'+atkText+'</b><br>'+levelBtn+'</div>' +
-            '<div class="c-footer"><span>'+c.id+'/120</span> <span>TCG-P</span></div>' +
+            '<div class="c-body"><b>'+(c.d > 0 ? 'ATK: '+c.d : 'ENERGY')+'</b></div>' +
+            '<div class="c-footer"><span>'+c.id+'/120</span></div>' +
         '</div>';
     }
-
-    function levelUp(idx) {
-        if(gems < 20) { alert("Need 20 Gems!"); return; }
-        gems -= 20; collection[idx].d += 10; updateStats(); showBinder(); updateArenaSelection();
-    }
-
-    function openArena() {
-        if(collection.length === 0) { alert("Get cards first!"); return; }
-        document.getElementById('battle-arena').style.display = 'flex';
-        var cpuPool = CARD_DB.Rare.concat(CARD_DB.Ultra).concat(CARD_DB.Mythic);
-        var cpu = cpuPool[Math.floor(Math.random()*cpuPool.length)];
-        cMax = cpu.h; cHP = cpu.h;
-        document.getElementById('cpu-arena-card').innerHTML = createCardHTML(cpu);
-        document.getElementById('cpu-hp').style.width = "100%";
-        updateArenaSelection();
-    }
-
-    function updateArenaSelection() {
-        var zone = document.getElementById('arena-selection-zone');
-        zone.innerHTML = "";
-        var fighters = collection.filter(function(c) { return c.h > 0; });
-        fighters.forEach(function(c) {
-            var actualIndex = collection.indexOf(c);
-            var slot = document.createElement('div');
-            slot.className = "mini-card-slot";
-            slot.innerHTML = createCardHTML(c, actualIndex);
-            zone.appendChild(slot);
-        });
-    }
-
-    function selectForBattle(idx) {
-        if(idx === null || document.getElementById('battle-arena').style.display !== 'flex') return;
-        var p = collection[idx];
-        if(p.h === 0) return;
-        pMax = p.h; pHP = p.h; pDmg = p.d;
-        document.getElementById('player-arena-card').innerHTML = createCardHTML(p);
-        document.getElementById('player-hp').style.width = "100%";
-        document.getElementById('atk-btn').style.display = "block";
-    }
-
-    function attack() {
-        cHP -= pDmg;
-        document.getElementById('cpu-hp').style.width = Math.max(0, (cHP/cMax*100)) + "%";
-        if(cHP <= 0) { alert("Victory! +50 Gems"); gems+=50; return closeArena(); }
-        setTimeout(function() {
-            pHP -= 30;
-            document.getElementById('player-hp').style.width = Math.max(0, (pHP/pMax*100)) + "%";
-            if(pHP <= 0) { alert("Defeat!"); return closeArena(); }
-        }, 500);
-    }
-
-    function closeArena() { document.getElementById('battle-arena').style.display = 'none'; updateStats(); }
 
     function showBinder() {
         var display = document.getElementById('main-display');
         display.innerHTML = "";
-        var filter = document.getElementById('type-filter').value;
-        var filtered = filter === 'all' ? collection : collection.filter(function(c) { return c.r === filter; });
-        var pageCards = filtered.slice(currentPage*6, (currentPage*6)+6);
-        
-        pageCards.forEach(function(c) {
+        var page = collection.slice(currentPage*6, (currentPage*6)+6);
+        page.forEach(function(c){
             var slot = document.createElement('div');
             slot.className = "binder-slot";
-            slot.innerHTML = createCardHTML(c, collection.indexOf(c));
+            slot.innerHTML = createCardHTML(c);
             display.appendChild(slot);
         });
         document.getElementById('page-indicator').innerText = "Page " + (currentPage + 1);
@@ -331,6 +222,23 @@
         localStorage.setItem('tcg_gems', gems);
         localStorage.setItem('tcg_binder_array', JSON.stringify(collection));
     }
+
+    function exportData() {
+        var data = btoa(JSON.stringify({g:gems, c:collection}));
+        prompt("Copy this code to save your progress:", data);
+    }
+
+    // HOLOGRAPHIC TILT LOGIC
+    window.addEventListener('deviceorientation', function(event) {
+        var x = event.beta;  // -180 to 180
+        var y = event.gamma; // -90 to 90
+        var layers = document.querySelectorAll('.holo-layer');
+        var pos = (y * 2) + 50; 
+        for(var i=0; i<layers.length; i++) {
+            layers[i].style.backgroundPosition = pos + "% " + pos + "%";
+        }
+    });
+
     function nextPage() { if((currentPage+1)*6 < collection.length) { currentPage++; showBinder(); } }
     function prevPage() { if(currentPage > 0) { currentPage--; showBinder(); } }
 
