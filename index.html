@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>JUST TCG pocket</title>
+    <title>TCG pocket</title>
     <style>
         :root { --bg: #0b0e14; --card: #1c2331; --rare: #ffcc00; --ultra: #00f2ff; --mythic: #ff00ff; --legend: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff); --accent: #ff0055; --gem: #a855f7; --gold: #ffd700; }
         * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-user-select: none; }
@@ -16,11 +16,11 @@
 
         /* BATTLE ARENA */
         #battle-arena { position: fixed; inset: 0; background: #0b0e14; z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; overflow-y: auto; }
-        .arena-card { width: 130px; height: 180px; position: relative; transition: 0.2s; flex-shrink: 0; }
+        .arena-card { width: 140px; height: 196px; position: relative; transition: 0.2s; flex-shrink: 0; }
         .hp-bg { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-bottom: 5px; border: 1px solid #444; }
         .hp-bar { height: 100%; background: #22c55e; transition: 0.3s; width: 100%; }
         #arena-selection-zone { width: 100%; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; margin-top: 10px; display: flex; gap: 10px; overflow-x: auto; min-height: 160px; border-top: 1px solid #333; }
-        .mini-card-slot { width: 90px; height: 130px; flex-shrink: 0; transform: scale(0.9); }
+        .mini-card-slot { width: 90px; height: 126px; flex-shrink: 0; transform: scale(0.9); }
 
         /* PACK SELECT */
         #pack-select { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 500; }
@@ -33,14 +33,14 @@
         .pack-art { width: 100%; height: 100%; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 80px; border: 5px solid white; overflow: hidden; }
         .pack-top-rip { position: absolute; top: 0; left: 0; width: 100%; height: 60px; background: #b91c1c; border-bottom: 4px dashed rgba(255,255,255,0.6); border-radius: 15px 15px 0 0; transition: transform 0.4s; z-index: 10; cursor: pointer; }
         
-        /* REVEAL FIX: Not squished */
+        /* REVEAL STAGE */
         #reveal-view { position: fixed; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
-        .reveal-stage { width: 240px; height: 340px; position: relative; }
+        .reveal-stage { width: 230px; height: 322px; position: relative; }
         .reveal-card { position: absolute; inset: 0; transition: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .swiped-up { transform: translateY(-120vh) rotate(-5deg) !important; opacity: 0; }
 
-        /* CARDS */
-        .card { width: 100%; height: 100%; background: #fff; border: 5px solid #d1d5db; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color: #111; position: relative; font-size: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        /* CARD FIX: Added fixed aspect ratio (width: height = 1: 1.4) */
+        .card { width: 100%; height: 100%; background: #fff; border: 5px solid #d1d5db; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; color: #111; position: relative; font-size: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); box-sizing: border-box; }
         .holo-layer { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0.4) 55%, transparent 80%); background-size: 200% 200%; z-index: 5; }
         .ultra .holo-layer, .mythic .holo-layer, .legendary .holo-layer { opacity: 0.5; }
         
@@ -50,17 +50,17 @@
         .card.legendary { border-image: var(--legend) 1; border-width: 5px; border-style: solid; }
         
         .c-header { padding: 4px; display: flex; justify-content: space-between; font-weight: bold; }
-        .c-name { padding: 2px 5px; font-size: 10px; font-weight: bold; border-bottom: 1px solid #ddd; text-align: left; }
-        .c-art { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #eee; margin: 3px; border-radius: 4px; }
-        .c-body { padding: 3px; flex-grow: 1; text-align: center; }
-        .c-footer { font-size: 6px; padding: 2px 5px; display: flex; justify-content: space-between; background: #f8fafc; }
+        .c-name { padding: 2px 5px; font-size: 11px; font-weight: bold; border-bottom: 1px solid #ddd; text-align: left; }
+        .c-art { height: 45%; display: flex; align-items: center; justify-content: center; font-size: 50px; background: #eee; margin: 3px; border-radius: 4px; border: 1px solid #ccc; }
+        .c-body { padding: 3px; flex-grow: 1; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+        .c-footer { font-size: 7px; padding: 2px 5px; display: flex; justify-content: space-between; background: #f8fafc; border-top: 1px solid #eee; }
 
         .lvl-btn { background: var(--gem); color: white; border: none; font-size: 8px; padding: 2px 5px; border-radius: 4px; margin-top: 2px; }
 
         /* BINDER */
-        #binder-frame { background: #1e293b; border: 8px solid #0f172a; border-radius: 20px; padding: 12px; margin-top: 10px; width: 95%; max-width: 340px; min-height: 420px; box-sizing: border-box; }
-        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
-        .binder-slot { height: 190px; }
+        #binder-frame { background: #1e293b; border: 8px solid #0f172a; border-radius: 20px; padding: 12px; margin-top: 10px; width: 95%; max-width: 340px; min-height: 440px; box-sizing: border-box; }
+        #main-display { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
+        .binder-slot { height: 210px; } /* Proportional to width */
 
         #save-btn { margin-top: 10px; color: #777; font-size: 10px; background: none; border: none; text-decoration: underline; padding-bottom: 20px; }
     </style>
@@ -78,7 +78,7 @@
         <div class="hp-bg"><div id="cpu-hp" class="hp-bar"></div></div>
         <div id="cpu-arena-card" class="arena-card"></div>
     </div>
-    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:13px;">Choose a fighter!</div>
+    <div id="battle-msg" style="text-align:center; font-weight:bold; color:var(--ultra); margin:10px 0; font-size:13px;">Choose fighter!</div>
     <div id="player-side" style="width:140px">
         <div id="player-arena-card" class="arena-card"></div>
         <div class="hp-bg" style="margin-top:5px;"><div id="player-hp" class="hp-bar"></div></div>
@@ -197,14 +197,15 @@
 
     function createCardHTML(c, idx) {
         var rClass = (c.r || 'common').toLowerCase();
-        var levelBtn = (idx !== undefined && c.h > 0) ? '<button class="lvl-btn" onclick="event.stopPropagation(); levelUp('+idx+')">Lvl Up (20💎)</button>' : '';
+        var hpLine = c.h > 0 ? 'HP ' + c.h : '';
+        var levelBtn = (idx !== undefined && c.h > 0) ? '<button class="lvl-btn" onclick="event.stopPropagation(); levelUp('+idx+')">Lvl Up</button>' : '';
         return '<div class="card '+rClass+'" onclick="selectForBattle('+idx+')">' +
             '<div class="holo-layer"></div>' +
-            '<div class="c-header"><span>BASIC</span> <span>'+(c.h > 0 ? 'HP '+c.h : '')+'</span></div>' +
+            '<div class="c-header"><span>BASIC</span> <span>'+hpLine+'</span></div>' +
             '<div class="c-name">'+c.n+'</div>' +
             '<div class="c-art">'+c.e+'</div>' +
-            '<div class="c-body"><b>'+(c.d > 0 ? 'ATK: '+c.d : 'ENERGY')+'</b><br>'+levelBtn+'</div>' +
-            '<div class="c-footer"><span>ID:'+c.id+'</span></div>' +
+            '<div class="c-body"><b>'+(c.d > 0 ? 'ATK: '+c.d : 'ENERGY')+'</b>'+levelBtn+'</div>' +
+            '<div class="c-footer"><span>TCG-P</span><span>ID:'+c.id+'</span></div>' +
         '</div>';
     }
 
@@ -253,7 +254,6 @@
     }
 
     function closeArena() { document.getElementById('battle-arena').style.display = 'none'; updateStats(); }
-
     function levelUp(idx) { if(gems >= 20) { gems -= 20; collection[idx].d += 10; updateStats(); showBinder(); } }
 
     function showBinder() {
